@@ -2,11 +2,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Configurações iniciais
-app.use(cors());
 app.use(bodyParser.json());
+
+// Configuração de CORS
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://www.databot.rd1.app'
+    : 'http://localhost:3000', // supondo que o frontend local rode na porta 3000
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 // ... (após as configurações iniciais)
 const campanhasRouter = require('./routes/campanhas');
