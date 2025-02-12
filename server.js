@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 // Configuração de CORS
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? 'https://www.databot.rd1.app'
+    ? 'https://databot.rd1.app'
     : 'http://localhost:3000', // supondo que o frontend local rode na porta 3000
   optionsSuccessStatus: 200,
 };
