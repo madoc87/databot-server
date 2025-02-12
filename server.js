@@ -15,7 +15,9 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+
+app.use(cors()); // Permite todas as origens temporariamente
 
 // ... (após as configurações iniciais)
 const campanhasRouter = require('./routes/campanhas');
