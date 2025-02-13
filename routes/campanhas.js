@@ -39,4 +39,10 @@ router.post('/', CampanhaController.criarCampanha);
 // Buscar uma campanha específica pelo ID
 router.get('/:id', CampanhaController.buscarCampanhaPorId);
 
+// Atualizar uma campanha
+router.put('/:id', CampanhaController.atualizarCampanha);
+
+// Apagar uma campanha
+router.delete('/:id', CampanhaController.apagarCampanha);
+
 module.exports = router;

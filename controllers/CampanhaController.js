@@ -2,57 +2,66 @@ const db = require('../config/database');
 
 // Função para listar todas as campanhas
 const listarCampanhas = (req, res) => {
-  db.all('SELECT * FROM Campanhas', (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  // Exemplo de consulta. Ajuste conforme a sua implementação.
+  const sql = 'SELECT * FROM Campanhas ORDER BY id';
+  db.all(sql, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 };
 
 // Função para criar uma nova campanha
 const criarCampanha = (req, res) => {
-  const { 
-    nome, 
-    custo_por_cliente, 
-    data_inicio,
-    numero_clientes,      // novos campos para os dados adicionais
-    numero_telefones,
-    vendido_manual, 
-    vendido_ia, 
-    trocar_depois, 
-    confirmar, 
-    outros 
-  } = req.body;
-
-  // Inserindo os dados no banco (supondo que a tabela "Campanhas" tenha estas colunas)
-  const sql = `
-    INSERT INTO Campanhas 
-      (nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones, vendido_manual, vendido_ia, trocar_depois, confirmar, outros)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-  const params = [nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones, vendido_manual, vendido_ia, trocar_depois, confirmar, outros];
-  
-  db.run(sql, params, function (err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  const { nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones } = req.body;
+  const sql = `INSERT INTO Campanhas (nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones) VALUES (?, ?, ?, ?, ?)`;
+  const params = [nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones];
+  db.run(sql, params, function(err) {
+    if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
   });
 };
 
 // Função para buscar uma campanha por ID
 const buscarCampanhaPorId = (req, res) => {
-  const id = req.params.id;
-  db.get('SELECT * FROM Campanhas WHERE id = ?', [id], (err, row) => {
+  const { id } = req.params;
+  const sql = 'SELECT * FROM Campanhas WHERE id = ?';
+  db.get(sql, [id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(row);
+  });
+};
+
+// Atualiza uma campanha
+const atualizarCampanha = (req, res) => {
+  const { id } = req.params;
+  const { nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones, vendido_manual, vendido_ia, trocar_depois, confirmar, outros } = req.body;
+  const sql = `
+    UPDATE Campanhas 
+    SET nome = ?, custo_por_cliente = ?, data_inicio = ?, numero_clientes = ?, numero_telefones = ?, 
+        vendido_manual = ?, vendido_ia = ?, trocar_depois = ?, confirmar = ?, outros = ?
+    WHERE id = ?`;
+  const params = [nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones, vendido_manual, vendido_ia, trocar_depois, confirmar, outros, id];
+  db.run(sql, params, function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ updatedID: id });
+  });
+};
+
+// Apaga uma campanha
+const apagarCampanha = (req, res) => {
+  const { id } = req.params;
+  console.log("Tentando apagar campanha com id:", id);
+  const sql = 'DELETE FROM Campanhas WHERE id = ?';
+  db.run(sql, [id], function(err) {
     if (err) {
+      console.error("Erro ao deletar campanha:", err);
       return res.status(500).json({ error: err.message });
     }
-    if (row) {
-      res.json(row);
-    } else {
-      res.status(404).json({ error: 'Campanha não encontrada' });
+    if (this.changes === 0) { 
+      // Nenhuma linha foi afetada, ou seja, a campanha não foi encontrada.
+      return res.status(404).json({ error: 'Campanha não encontrada ou já apagada' });
     }
+    res.json({ deletedID: id });
   });
 };
 
@@ -60,4 +69,6 @@ module.exports = {
   listarCampanhas,
   criarCampanha,
   buscarCampanhaPorId,
+  atualizarCampanha,
+  apagarCampanha,
 };
