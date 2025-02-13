@@ -12,11 +12,45 @@ const listarCampanhas = (req, res) => {
 
 // Função para criar uma nova campanha
 const criarCampanha = (req, res) => {
-  const { nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones } = req.body;
-  const sql = `INSERT INTO Campanhas (nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones) VALUES (?, ?, ?, ?, ?)`;
-  const params = [nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones];
+  // Definindo valores padrão para campos numéricos de status
+  const {
+    nome,
+    custo_por_cliente,
+    data_inicio,
+    numero_clientes,
+    numero_telefones,
+    vendido_manual = 0,
+    vendido_ia = 0,
+    trocar_depois = 0,
+    confirmar = 0,
+    outros = 0
+    // total_status = 0
+  } = req.body;
+  
+  // Certifique-se que sua tabela 'Campanhas' possua essas colunas
+  const sql = `INSERT INTO Campanhas 
+    (nome, custo_por_cliente, data_inicio, numero_clientes, numero_telefones, vendido_manual, vendido_ia, trocar_depois, confirmar, outros)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  
+  const params = [
+    nome,
+    custo_por_cliente,
+    data_inicio,
+    numero_clientes,
+    numero_telefones,
+    vendido_manual,
+    vendido_ia,
+    trocar_depois,
+    confirmar,
+    outros
+    // total_status
+  ];
+  
   db.run(sql, params, function(err) {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error("Erro ao criar campanha:", err);
+      return res.status(500).json({ error: err.message });
+    }
     res.json({ id: this.lastID });
   });
 };
