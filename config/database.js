@@ -49,6 +49,27 @@ db.serialize(() => {
     if (err) console.error("Erro criando Vendas:", err.message);
     else console.log("Tabela Vendas criada ou já existente.");
   });
+
+  // Adiciona as novas colunas à tabela Vendas se elas não existirem
+  db.run(`
+    ALTER TABLE Vendas ADD COLUMN riscado INTEGER DEFAULT 0
+  `, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error("Erro ao adicionar coluna riscado:", err.message);
+    } else {
+      console.log("Coluna riscado adicionada ou já existente.");
+    }
+  });
+
+  db.run(`
+    ALTER TABLE Vendas ADD COLUMN mensagem TEXT
+  `, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error("Erro ao adicionar coluna mensagem:", err.message);
+    } else {
+      console.log("Coluna mensagem adicionada ou já existente.");
+    }
+  });
 });
 
 module.exports = db;
