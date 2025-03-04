@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
   if (data) {
     query = `
       SELECT id, data_venda, status, cliente, telefone, dia, periodo, pagamento, 
-             endereco AS end, cpf, email, observacao 
+             endereco AS end, cpf, email, observacao, riscado, mensagem 
       FROM Vendas 
       WHERE data_venda = ? 
       ORDER BY id
@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
   } else {
     query = `
       SELECT id, data_venda, status, cliente, telefone, dia, periodo, pagamento, 
-             endereco AS end, cpf, email, observacao 
+             endereco AS end, cpf, email, observacao, riscado, mensagem 
       FROM Vendas 
       ORDER BY data_venda, id
     `;
@@ -54,14 +54,16 @@ router.post('/', (req, res) => {
 // Rota para atualizar uma venda existente
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { data_venda, status, cliente, telefone, dia, periodo, pagamento, end, cpf, email, observacao } = req.body;
+  console.log('Atualizando venda:', id);
+  console.log('Dados recebidos:', req.body);
+  const { data_venda, status, cliente, telefone, dia, periodo, pagamento, end, cpf, email, observacao, riscado, mensagem } = req.body;
   const sql = `
     UPDATE Vendas
     SET data_venda = ?, status = ?, cliente = ?, telefone = ?, dia = ?, 
-        periodo = ?, pagamento = ?, endereco = ?, cpf = ?, email = ?, observacao = ?
+        periodo = ?, pagamento = ?, endereco = ?, cpf = ?, email = ?, observacao = ?, riscado = ?, mensagem = ?
     WHERE id = ?
   `;
-  const params = [data_venda, status, cliente, telefone, dia, periodo, pagamento, end, cpf, email, observacao || null, id];
+  const params = [data_venda, status, cliente, telefone, dia, periodo, pagamento, end, cpf, email, observacao || null, riscado || 0, mensagem || null, id];
   
   db.run(sql, params, function(err) {
     if (err) {
